@@ -14,6 +14,10 @@ public class Map {
 				tiles[x][y] = new Tile(Tile.Type.Grass);
 			}
 		}
+		
+		tiles[10][10] = new Tile(Tile.Type.Wall);
+		tiles[11][10] = new Tile(Tile.Type.Wall);
+		tiles[12][10] = new Tile(Tile.Type.Wall);
 	}
 
 	
