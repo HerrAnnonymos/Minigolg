@@ -4,6 +4,7 @@ public class Tile {
 		Grass, Wall, Hole,
 	}
 	private Type type;
+	private Vector2[] collisionPoints;
 	
 	public Tile(Type type) {
 		this.type = type;
@@ -19,4 +20,3 @@ public class Tile {
 		this.type = type;
 	}
 }
-

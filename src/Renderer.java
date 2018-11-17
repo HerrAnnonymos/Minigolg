@@ -7,6 +7,7 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.glu.GLU;
 
 public class Renderer implements GLEventListener{
 
@@ -18,6 +19,7 @@ public class Renderer implements GLEventListener{
 	private GLProfile profile;
 	private Frame frame;
 	private GL2 gl;
+	private GLU glu;
 	
 	private Map map;
 	private float scale;
@@ -49,23 +51,53 @@ public class Renderer implements GLEventListener{
 				
 				switch (tiles[x][y].getType()) {
 				case Grass:
-					drawGrass(xPos, yPos, width, height);
+					gl.glColor3f(0f, 1f, 0f);
 					break;
 				case Wall:
+					gl.glColor3f(1f, 0f, 0f);
 					break;
 				case Hole:
 					break;
 				}
+				drawTile(xPos, yPos, width, height);
 			}
 		}
 	}
 	
-	public void drawGrass(float x, float y, float width, float height) {
-		//gl.glBegin(GL2.GL_LINES);
-		gl.glColor3f(1, 0, 0);
-		gl.glVertex2f(x, y);
-		gl.glVertex2f(width, height);
-		//gl.glEnd();
+	public void drawBall(float x, float y, float radius) {
+		gl.glColor3f(0, 0, 1);
+		drawCircle(x, y, radius, 20);
+	}
+	
+	public void drawCircle(float cx, float cy, float r, int num_segments) { 
+		gl.glBegin(GL2.GL_POLYGON);
+		for(int i = 0; i < num_segments; i++) { 
+			float theta = 2.0f * 3.1415926f * (float)i / (float)(num_segments);//get the current angle 
+
+			float x = (float) (r * Math.cos(theta));//calculate the x component 
+			float y = (float) (r * Math.sin(theta));//calculate the y component 
+
+			gl.glVertex2f(x/1600 + cx/1600, y/900 + cy/900);//output vertex 
+
+		} 
+		gl.glEnd(); 
+	}
+	
+	public void drawTile(float x, float y, float width, float height) {
+		gl.glBegin(GL2.GL_POLYGON);
+		gl.glVertex2f(x/1600f, y/900f);
+		gl.glVertex2f(x/1600f  + width/1600f, y/900f);
+		gl.glVertex2f(x/1600f + width/1600f, y/900f + height/900f);
+		gl.glVertex2f(x/1600f, y/900f  + height/900f);
+		gl.glEnd();
+		
+		gl.glBegin(GL2.GL_LINE_LOOP);
+		gl.glColor3f(1f, 0f, 0f);
+		gl.glVertex2f(x/1600f, y/900f);
+		gl.glVertex2f(x/1600f  + width/1600f, y/900f);
+		gl.glVertex2f(x/1600f + width/1600f, y/900f + height/900f);
+		gl.glVertex2f(x/1600f, y/900f  + height/900f);
+		gl.glEnd();
 	}
 	
 	public void initWindow() {
@@ -74,22 +106,19 @@ public class Renderer implements GLEventListener{
 		glCanvas = new GLCanvas(capabilities);
 		glCanvas.addGLEventListener(this);
 		glCanvas.setSize(1600, 900);
+		glCanvas.setDefaultCloseOperation(WindowClosingMode.DISPOSE_ON_CLOSE);
 		frame = new Frame("Minigolg");
 		frame.setSize(1600, 900);
 		frame.add(glCanvas);
 		frame.setVisible(true);
+		glu = new GLU();
 	}
 	
 	
 	@Override
 	public void display(GLAutoDrawable drawable) {
-		gl = drawable.getGL().getGL2();
-		gl.glBegin (GL2.GL_LINES);
-		gl.glVertex3f(0.50f,-0.50f,0);
-		gl.glVertex3f(-0.50f,0.50f,0);
-		drawMap(map, scale, xOffset, yOffset);
-		gl.glEnd();
-		
+		drawMap(map, scale, xOffset, yOffset);	
+		drawBall(300, 300, 16);
 	}
 
 	@Override
@@ -98,7 +127,14 @@ public class Renderer implements GLEventListener{
 
 	@Override
 	public void init(GLAutoDrawable drawable) {
-		//gl = drawable.getGL().getGL2();
+		gl = drawable.getGL().getGL2();
+		glu = new GLU();
+		gl.glViewport(0, 0, 1600, 900);
+		gl.glMatrixMode(GL2.GL_PROJECTION);
+		gl.glLoadIdentity();
+		gl.glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
+		gl.glLoadIdentity();
 		
 	}
 

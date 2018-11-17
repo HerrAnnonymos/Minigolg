@@ -3,11 +3,12 @@ public class GameManager {
 	
 	private Renderer renderer;
 	private Map map;
+	static boolean gameRunning = true;
 	
 	public GameManager() {
 		init();
 		long prev = System.currentTimeMillis();
-		while(true) {
+		while(gameRunning) {
 			double delta = (System.currentTimeMillis() - prev) * 1000d;
 			prev = System.currentTimeMillis();
 			update();
@@ -29,6 +30,14 @@ public class GameManager {
 	
 	public void fixedUpdate(double delta) {
 		//Physics
+	}
+
+	public static boolean isGameRunning() {
+		return gameRunning;
+	}
+
+	public static void setGameRunning(boolean gameRunning) {
+		GameManager.gameRunning = gameRunning;
 	}
 	
 }
