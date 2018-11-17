@@ -3,15 +3,16 @@ public class GameManager {
 	
 	private Renderer renderer;
 	private Map map;
+	private Ball ball;
+	private Player player;
 	static boolean gameRunning = true;
 	
 	public GameManager() {
 		init();
 		long prev = System.currentTimeMillis();
 		while(gameRunning) {
-			double delta = (System.currentTimeMillis() - prev) * 1000d;
+			float delta = (System.currentTimeMillis() - prev)/1000f;
 			prev = System.currentTimeMillis();
-			update();
 			fixedUpdate(delta);
 		}
 	}
@@ -19,17 +20,16 @@ public class GameManager {
 	public void init() {
 		map = new Map(60, 60);
 		map.initTestMap();
-		renderer = new Renderer();
+		map.initCollisionPoints();
+		ball = new Ball(new Vector2(250, 250), 16);
+		player = new Player(ball);
+		renderer = new Renderer(map, ball, player, 1, 0, 0);
 	}
 	
-	public void update() {
-		//Renderer
-		renderer.setMapParameters(map, 1, 0, 0);
-		//renderer.drawMap(map, 1, 0, 0);
-	}
-	
-	public void fixedUpdate(double delta) {
+	public void fixedUpdate(float delta) {
 		//Physics
+		ball.move(ball.calcMaxMoveDistance(map.getCollisionPoints()), delta);
+		
 	}
 
 	public static boolean isGameRunning() {
