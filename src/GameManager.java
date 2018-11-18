@@ -17,13 +17,18 @@ public class GameManager {
 		}
 	}
 	
+	public void moveCamera(float scale, Vector2 offset) {
+		renderer.setScale(renderer.getScale() + scale);
+		renderer.setOffset(renderer.getOffset().add(offset));
+	}
+	
 	public void init() {
 		map = new Map(60, 60);
 		map.initTestMap();
 		map.initCollisionPoints();
 		ball = new Ball(new Vector2(250, 250), 16);
-		player = new Player(ball);
-		renderer = new Renderer(map, ball, player, 1, 0, 0);
+		player = new Player(ball, this);
+		renderer = new Renderer(map, ball, player, 1, new Vector2(0, 0));
 	}
 	
 	public void fixedUpdate(float delta) {

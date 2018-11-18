@@ -7,10 +7,12 @@ import java.awt.event.MouseMotionListener;
 public class Player implements MouseListener, KeyListener, MouseMotionListener{
 
 	private Ball ball;
+	private GameManager gameManager;
 	private Vector2 mousePos;
 	
-	public Player(Ball ball) {
+	public Player(Ball ball, GameManager gameManager) {
 		this.ball = ball;
+		this.gameManager = gameManager;
 		mousePos = new Vector2(0, 0);
 	}
 
@@ -20,7 +22,17 @@ public class Player implements MouseListener, KeyListener, MouseMotionListener{
 
 
 	@Override
-	public void keyPressed(KeyEvent e) {		
+	public void keyPressed(KeyEvent e) {	
+		float xOffset = 0;
+		float yOffset = 0;
+		int k = e.getKeyCode();
+		
+		if(k == KeyEvent.VK_LEFT) xOffset++;
+		if(k == KeyEvent.VK_RIGHT) xOffset--;
+		if(k == KeyEvent.VK_UP) yOffset--;
+		if(k == KeyEvent.VK_DOWN) yOffset ++;
+		
+		gameManager.moveCamera(0, new Vector2(xOffset, yOffset).scale(10));
 	}
 
 

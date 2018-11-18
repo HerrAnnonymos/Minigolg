@@ -35,6 +35,10 @@ public class Vector2 {
 		return (double) Math.acos( ( scalar(v)/(abs() * v.abs() )* (Math.PI/180) ));
 	}
 	
+	public Vector2 normal() {
+		return new Vector2(-y, x);
+	}
+	
 	public Vector2 scale(float scale){
 		return new Vector2(x*scale, y*scale);
 	}

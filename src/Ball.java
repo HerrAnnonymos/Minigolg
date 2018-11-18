@@ -1,7 +1,5 @@
 import java.util.ArrayList;
 
-import com.jogamp.newt.event.MouseAdapter;
-
 public class Ball{
 
 	private float radian;
@@ -25,8 +23,10 @@ public class Ball{
 		Vector2 tempVel = vel.scale(delta);
 		if(maxMoveDistance < tempVel.abs()){
 			collisonVector = closestCP.subtract(secondClosestCP);
-			double angle = Math.min(vel.angle(collisonVector), vel.angle(collisonVector.scale(-1)));
-			vel = vel.rotate(-Math.PI - 2*angle);
+			//double angle = Math.min(vel.angle(collisonVector), vel.angle(collisonVector.scale(-1)));
+			//Vector2 rotatedVector = vel.rotate(2*(Math.PI/2 - angle));
+			//vel = rotatedVector;
+			vel = vel.subtract(collisonVector.normal().scale(2*vel.scalar(collisonVector)));
 		}
 		pos = pos.add(vel.scale(delta));
 	}

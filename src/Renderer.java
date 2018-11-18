@@ -27,27 +27,22 @@ public class Renderer implements GLEventListener{
 	private Ball ball;
 	private Player player;
 	private float scale;
-	private float xOffset;
-	private float yOffset;
+	private Vector2 offset;
 	
-	public Renderer(Map map, Ball ball, Player player, float scale, float xOffset, float yOffset) {
+	public Renderer(Map map, Ball ball, Player player, float scale, Vector2 offset) {
 		this.map = map;
 		this.ball = ball;
 		this.player = player;
 		this.scale = scale;
-		this.xOffset = xOffset;
-		this.yOffset = yOffset;
+		this.offset = offset;
 		initWindow();
 	}
 	
-	public void drawMap(Map map, float scale, float xOffset, float yOffset) {
+	public void drawMap(Map map, float scale, Vector2 offset) {
 		Tile[][] tiles = map.getTiles();
 		for (int x = 0; x < tiles.length; x++) {
 			for (int y = 0; y < tiles[x].length; y++) {
-				float xPos = (xOffset + x * TILE_WIDTH) * scale;
-				float yPos = (yOffset + y * TILE_HEIGHT) * scale;
-				float width =  TILE_WIDTH * scale;
-				float height = TILE_HEIGHT * scale;
+				Vector2 pos = new Vector2(x * TILE_WIDTH, y * TILE_HEIGHT);
 				
 				switch (tiles[x][y].getType()) {
 				case Grass:
@@ -59,26 +54,29 @@ public class Renderer implements GLEventListener{
 				case Hole:
 					break;
 				}
-				drawTile(xPos, yPos, width, height);
+				drawTile(pos, TILE_WIDTH, TILE_HEIGHT);
 			}
 		}
 	}
 	
+	public void drawVertex2f(float v1, float v2) {
+		gl.glVertex2f(((v1 + offset.getX())*scale)/SCREEN_WIDTH, ((v2 + offset.getY())*scale)/SCREEN_HEIGHT);
+	}
+	
 	public void drawVector(Vector2 v, float x, float y){
-		//gl.glColor3f(1, 1, 1);
 		gl.glLineWidth(3f);
 		gl.glBegin(GL2.GL_LINES);
-		gl.glVertex2f(x/Renderer.SCREEN_WIDTH, y/Renderer.SCREEN_HEIGHT);
-		gl.glVertex2f((x + v.getX())/Renderer.SCREEN_WIDTH, (y + v.getY())/Renderer.SCREEN_HEIGHT);
+		drawVertex2f(x, y);
+		drawVertex2f(x + v.getX(), y + v.getY());
 		gl.glEnd();
 	}
 	
 	public void drawBall(Vector2 pos, float radius) {
 		gl.glColor3f(0, 0, 1);
-		drawCircle(pos.getX(), pos.getY(), radius, 20);
+		drawCircle(pos, radius, 20);
 	}
 	
-	public void drawCircle(float cx, float cy, float r, int num_segments) { 
+	public void drawCircle(Vector2 pos, float r, int num_segments) { 
 		gl.glBegin(GL2.GL_POLYGON);
 		for(int i = 0; i < num_segments; i++) { 
 			float theta = 2.0f * 3.1415926f * (float)i / (float)(num_segments);//get the current angle 
@@ -86,36 +84,36 @@ public class Renderer implements GLEventListener{
 			float x = (float) (r * Math.cos(theta));//calculate the x component 
 			float y = (float) (r * Math.sin(theta));//calculate the y component 
 
-			gl.glVertex2f(x/SCREEN_WIDTH + cx/SCREEN_WIDTH, y/SCREEN_HEIGHT + cy/SCREEN_HEIGHT);//output vertex 
+			drawVertex2f(x+ pos.getX(), y + pos.getY());//output vertex 
 
 		} 
 		gl.glEnd(); 
 	}
 	
-	public void drawTile(float x, float y, float width, float height) {
+	public void drawTile(Vector2 pos, float width, float height) {
 		gl.glBegin(GL2.GL_POLYGON);
-		gl.glVertex2f(x/SCREEN_WIDTH, y/SCREEN_HEIGHT);
-		gl.glVertex2f(x/SCREEN_WIDTH  + width/SCREEN_WIDTH, y/SCREEN_HEIGHT);
-		gl.glVertex2f(x/SCREEN_WIDTH + width/SCREEN_WIDTH, y/SCREEN_HEIGHT + height/SCREEN_HEIGHT);
-		gl.glVertex2f(x/SCREEN_WIDTH, y/SCREEN_HEIGHT  + height/SCREEN_HEIGHT);
+		drawVertex2f(pos.getX(), pos.getY());
+		drawVertex2f(pos.getX()  + width, pos.getY());
+		drawVertex2f(pos.getX() + width, pos.getY() + height);
+		drawVertex2f(pos.getX(), pos.getY()  + height);
 		gl.glEnd();
 		
-		gl.glBegin(GL2.GL_LINE_LOOP);
+		/*gl.glBegin(GL2.GL_LINE_LOOP);
 		gl.glColor3f(1f, 0f, 0f);
-		gl.glVertex2f(x/SCREEN_WIDTH, y/SCREEN_HEIGHT);
-		gl.glVertex2f(x/SCREEN_WIDTH  + width/SCREEN_WIDTH, y/SCREEN_HEIGHT);
-		gl.glVertex2f(x/SCREEN_WIDTH + width/SCREEN_WIDTH, y/SCREEN_HEIGHT + height/SCREEN_HEIGHT);
-		gl.glVertex2f(x/SCREEN_WIDTH, y/SCREEN_HEIGHT  + height/SCREEN_HEIGHT);
-		gl.glEnd();
+		drawVertex2f(pos.getX(), pos.getY());
+		drawVertex2f(pos.getX()  + width, pos.getY());
+		drawVertex2f(pos.getX() + width, pos.getY() + height);
+		drawVertex2f(pos.getX(), pos.getY()  + height);
+		gl.glEnd();*/
 	}
 	
 	public void drawCollisionPoints(List<Vector2> collisionPoints){
 		for (Vector2 v: collisionPoints){
 			gl.glBegin(GL2.GL_POLYGON);
-			gl.glVertex2f((v.getX() - 2)/SCREEN_WIDTH, (v.getY() - 2)/SCREEN_HEIGHT);
-			gl.glVertex2f((v.getX() - 2)/SCREEN_WIDTH, (v.getY() + 2)/SCREEN_HEIGHT);
-			gl.glVertex2f((v.getX() + 2)/SCREEN_WIDTH, (v.getY() + 2)/SCREEN_HEIGHT);
-			gl.glVertex2f((v.getX() + 2)/SCREEN_WIDTH, (v.getY() - 2)/SCREEN_HEIGHT);
+			drawVertex2f((v.getX() - 2), (v.getY() - 2));
+			drawVertex2f((v.getX() - 2), (v.getY() + 2));
+			drawVertex2f((v.getX() + 2), (v.getY() + 2));
+			drawVertex2f((v.getX() + 2), (v.getY() - 2));
 			gl.glEnd();
 		}
 	}
@@ -143,7 +141,7 @@ public class Renderer implements GLEventListener{
 	
 	@Override
 	public void display(GLAutoDrawable drawable) {
-		drawMap(map, scale, xOffset, yOffset);	
+		drawMap(map, scale, offset);	
 		drawBall(ball.getPos(), ball.getRadian());
 		drawCollisionPoints(map.getCollisionPoints());
 		
@@ -169,6 +167,22 @@ public class Renderer implements GLEventListener{
 
 	@Override
 	public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {		
+	}
+
+	public float getScale() {
+		return scale;
+	}
+
+	public void setScale(float scale) {
+		this.scale = scale;
+	}
+
+	public Vector2 getOffset() {
+		return offset;
+	}
+
+	public void setOffset(Vector2 offset) {
+		this.offset = offset;
 	}
 
 }
